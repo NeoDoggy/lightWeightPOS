@@ -104,7 +104,7 @@ export const Onboarding = {
         const sidebar = document.querySelector('#sidebar-container');
         const cart = document.querySelector('.cart-section');
         
-        // 1. POPULATE TEXT IMMEDIATELY (Move this out of executeDraw to the top)
+        // POPULATE TEXT IMMEDIATELY (Move this out of executeDraw to the top)
         document.getElementById('tour-title').innerText = i18n.t(step.titleKey);
         document.getElementById('tour-desc').innerText = i18n.t(step.descKey);
         document.getElementById('tour-btn-skip').innerText = i18n.t('tour_skip');
@@ -115,7 +115,7 @@ export const Onboarding = {
         let waitForAnimation = false;
         let animatedElement = null;
 
-        // 2. Mobile Cart Drawer Management
+        // Mobile Cart Drawer Management
         if (cart) {
             if (step.target === '.cart-section' && window.innerWidth <= 1024) {
                 cart.classList.add('mobile-open');
@@ -126,7 +126,7 @@ export const Onboarding = {
             }
         }
 
-        // 3. PC Sidebar Management
+        // PC Sidebar Management
         if (step.target === '#sidebar-container' && Store.get('sidebar_collapsed')) {
             Store.set('sidebar_collapsed', false);
             if (!waitForAnimation) {
@@ -180,7 +180,7 @@ export const Onboarding = {
                 }
             }
 
-            // 4. SHOW CONTAINER (Only after text is injected and coordinates are set)
+            // SHOW CONTAINER (Only after text is injected and coordinates are set)
             document.getElementById('tour-container').classList.add('active');
         };
 

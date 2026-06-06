@@ -33,6 +33,12 @@ export const initProductGrid = async (containerId) => {
     };
 
     const render = () => {
+        // 1. COMBINE AND SORT: Mix products and sets together based on sort_order
+        const combinedItems = [
+            ...products.map(p => ({ ...p, itemType: 'product' })),
+            ...sets.map(s => ({ ...s, itemType: 'set' }))
+        ].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+
         container.innerHTML = `
             <div class="workspace-header">
                 <select class="event-selector" id="event-select">
@@ -45,30 +51,33 @@ export const initProductGrid = async (containerId) => {
             </div>
             
             <div class="products-container" id="grid-items">
-                ${products.map(p => {
-                    const isSoldOut = p.stock_quantity <= 0;
-                    return `
-                        <div class="product-card" data-type="product" data-id="${p.id}" data-name="${p.name}" data-price="${p.price}" style="${isSoldOut ? 'opacity: 0.5;' : ''}">
-                            <div class="delete-badge"><i class="fa-solid fa-xmark"></i></div>
-                            <div class="product-name">${p.name}</div>
-                            <div style="font-size:0.75rem; color:${isSoldOut ? 'var(--accent-red)' : 'var(--text-muted)'}; margin-top:0.2rem;">
-                                ${isSoldOut ? 'SOLD OUT' : `Stock: ${p.stock_quantity}`}
+                ${combinedItems.map(item => {
+                    // 2. RENDER COMBINED ITEMS
+                    if (item.itemType === 'product') {
+                        const isSoldOut = item.stock_quantity <= 0;
+                        return `
+                            <div class="product-card" data-type="product" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" style="${isSoldOut && !isEditMode ? 'opacity: 0.5;' : ''}">
+                                <div class="delete-badge"><i class="fa-solid fa-xmark"></i></div>
+                                <div class="product-name">${item.name}</div>
+                                <div style="font-size:0.75rem; color:${isSoldOut ? 'var(--accent-red)' : 'var(--text-muted)'}; margin-top:0.2rem;">
+                                    ${isSoldOut ? 'SOLD OUT' : `Stock: ${item.stock_quantity}`}
+                                </div>
+                                <div class="product-price">$${item.price}</div>
                             </div>
-                            <div class="product-price">$${p.price}</div>
-                        </div>
-                    `;
+                        `;
+                    } else {
+                        return `
+                            <div class="product-card" data-type="set" data-id="${item.id}">
+                                <div class="delete-badge"><i class="fa-solid fa-xmark"></i></div>
+                                <div>
+                                    <div class="set-indicator">BUNDLE SET</div>
+                                    <div class="product-name">${item.name}</div>
+                                </div>
+                                <div class="product-price">$${item.bundle_price}</div>
+                            </div>
+                        `;
+                    }
                 }).join('')}
-                
-                ${sets.map(s => `
-                    <div class="product-card set-card" data-type="set" data-id="${s.id}">
-                        <div class="delete-badge"><i class="fa-solid fa-xmark"></i></div>
-                        <div>
-                            <div class="set-indicator">BUNDLE SET</div>
-                            <div class="product-name">${s.name}</div>
-                        </div>
-                        <div class="product-price">$${s.bundle_price}</div>
-                    </div>
-                `).join('')}
 
                 ${isEditMode ? `
                     <div class="product-card add-card" id="btn-add-product" title="Add Product"><i class="fa-solid fa-plus"></i></div>
@@ -153,6 +162,48 @@ export const initProductGrid = async (containerId) => {
     };
 
     const bindEvents = () => {
+        // --- 3. SORTABLE.JS ENGINE INIT ---
+        const gridItems = document.getElementById('grid-items');
+        if (gridItems && window.Sortable) {
+            if (window.gridSortable) window.gridSortable.destroy(); // Clean up old instance
+            
+            window.gridSortable = new Sortable(gridItems, {
+                animation: 200, 
+                disabled: !isEditMode, // Only drag when Edit Mode is ON
+                draggable: '.product-card[data-id]', // Exclude the "Add" buttons
+                ghostClass: 'sortable-ghost',
+                dragClass: 'sortable-drag',
+                
+                onStart: () => {
+                    const gridSection = document.querySelector('.grid-section');
+                    if(gridSection) gridSection.classList.add('is-dragging');
+                },
+                
+                onEnd: async (evt) => {
+                    const gridSection = document.querySelector('.grid-section');
+                    if(gridSection) gridSection.classList.remove('is-dragging');
+
+                    if (evt.oldIndex === evt.newIndex) return;
+
+                    const cards = [...gridItems.querySelectorAll('.product-card[data-id]')];
+                    for (let i = 0; i < cards.length; i++) {
+                        const id = cards[i].getAttribute('data-id');
+                        const type = cards[i].getAttribute('data-type');
+                        const storeName = type === 'set' ? 'product_sets' : 'products';
+                        
+                        const dbItem = await DB.execute(storeName, 'readonly', 'get', id);
+                        if (dbItem && dbItem.sort_order !== i) {
+                            dbItem.sort_order = i;
+                            await DB.execute(storeName, 'readwrite', 'put', dbItem);
+                        }
+                    }
+                    
+                    await loadData(); 
+                    render();
+                }
+            });
+        }
+
         document.getElementById('event-select').addEventListener('change', async (e) => {
             currentEventId = e.target.value;
             Store.set('current_event_id', currentEventId);
@@ -233,7 +284,6 @@ export const initProductGrid = async (containerId) => {
             });
         });
 
-        // Open Modals
         if (document.getElementById('btn-add-product')) {
             document.getElementById('btn-add-product').addEventListener('click', () => {
                 editingId = null;
@@ -257,7 +307,6 @@ export const initProductGrid = async (containerId) => {
             });
         }
 
-        // Set Modal Dynamic Rows
         const setContainer = document.getElementById('set-items-container');
         if (setContainer) {
             document.getElementById('btn-add-set-row').addEventListener('click', () => {
@@ -280,12 +329,15 @@ export const initProductGrid = async (containerId) => {
                 
                 if (!name || isNaN(price) || isNaN(quant)) return alert('Fill all fields correctly.');
 
+                // 4. PRESERVE SORT ORDER ON SAVE
+                const existingItem = editingId ? products.find(p => p.id === editingId) : null;
                 const payload = {
                     id: editingId || `p_${Date.now()}`, 
                     event_id: currentEventId, 
                     name, 
                     price, 
-                    stock_quantity: quant
+                    stock_quantity: quant,
+                    sort_order: existingItem ? existingItem.sort_order : Date.now() // Put new items at the end
                 };
 
                 await DB.execute('products', 'readwrite', editingId ? 'put' : 'add', payload);
@@ -315,12 +367,15 @@ export const initProductGrid = async (containerId) => {
 
                 if(!valid || included_items.length === 0) return alert('Select items and quantities properly.');
 
+                // 4. PRESERVE SORT ORDER ON SAVE
+                const existingSet = editingId ? sets.find(s => s.id === editingId) : null;
                 const payload = {
                     id: editingId || `s_${Date.now()}`, 
                     event_id: currentEventId, 
                     name, 
                     bundle_price: price, 
-                    included_items
+                    included_items,
+                    sort_order: existingSet ? existingSet.sort_order : Date.now() // Put new sets at the end
                 };
 
                 await DB.execute('product_sets', 'readwrite', editingId ? 'put' : 'add', payload);

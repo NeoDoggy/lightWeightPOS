@@ -11,12 +11,15 @@ const CORE_ASSETS = [
     './src/core/logger.js',
     './src/core/i18n.js',
     './src/core/db.js',
+    './src/core/dialog.js',
+    './src/core/toast.js',
     './src/core/dataExchange.js',
     './src/components/Sidebar.js',
     './src/components/ProductGrid.js',
     './src/components/Cart.js',
     './src/components/Dashboard.js',
-    './src/components/Settings.js'
+    './src/components/Settings.js',
+    './src/components/Onboarding.js'
 ];
 
 // Install Event: Cache all core assets
@@ -49,26 +52,26 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event: Cache-First Strategy
 self.addEventListener('fetch', (event) => {
-    // Ignore external requests (like FontAwesome or external APIs)
-    if (!event.request.url.startsWith(self.location.origin)) {
-        return;
-    }
+    if (!event.request.url.startsWith('http')) return;
 
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
-            if (cachedResponse) {
-                return cachedResponse; // Return from cache immediately
-            }
+            if (cachedResponse) return cachedResponse; 
 
-            // If not in cache, fetch from network and add to cache dynamically
             return fetch(event.request).then((networkResponse) => {
-                return caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, networkResponse.clone());
+                // Ignore bad responses
+                if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
                     return networkResponse;
+                }
+
+                const responseToCache = networkResponse.clone();
+                caches.open(CACHE_NAME).then((cache) => {
+                    cache.put(event.request, responseToCache);
                 });
+
+                return networkResponse;
             }).catch(() => {
-                // Optional: Return a specific offline fallback page here if needed
-                console.error('[Service Worker] Network request failed and not in cache:', event.request.url);
+                console.warn('[Service Worker] Network offline:', event.request.url);
             });
         })
     );
