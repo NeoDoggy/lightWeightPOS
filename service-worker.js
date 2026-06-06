@@ -1,22 +1,22 @@
 const CACHE_NAME = 'lw-pos-cache-v1';
 const CORE_ASSETS = [
-    '/',
-    '/index.html',
-    '/manifest.json',
-    '/src/main.js',
-    '/src/styles/variables.css',
-    '/src/styles/layouts.css',
-    '/src/styles/components.css',
-    '/src/core/store.js',
-    '/src/core/logger.js',
-    '/src/core/i18n.js',
-    '/src/core/db.js',
-    '/src/core/dataExchange.js',
-    '/src/components/Sidebar.js',
-    '/src/components/ProductGrid.js',
-    '/src/components/Cart.js',
-    '/src/components/Dashboard.js',
-    '/src/components/Settings.js'
+    './',
+    './index.html',
+    './manifest.json',
+    './src/main.js',
+    './src/styles/variables.css',
+    './src/styles/layouts.css',
+    './src/styles/components.css',
+    './src/core/store.js',
+    './src/core/logger.js',
+    './src/core/i18n.js',
+    './src/core/db.js',
+    './src/core/dataExchange.js',
+    './src/components/Sidebar.js',
+    './src/components/ProductGrid.js',
+    './src/components/Cart.js',
+    './src/components/Dashboard.js',
+    './src/components/Settings.js'
 ];
 
 // Install Event: Cache all core assets
