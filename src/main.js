@@ -66,7 +66,7 @@ const init = async() => {
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/service-worker.js')
+            navigator.serviceWorker.register('../service-worker.js')
                 .catch(err => Logger.error('Service Worker Registration Failed', err));
         });
     }
