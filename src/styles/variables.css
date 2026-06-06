@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono&family=Space+Grotesk:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@200..900&family=Noto+Sans+JP:wght@100..900&display=swap');
+
+:root {
+    --bg-base: #0f111a;
+    --bg-surface: #161822;
+    --border-structural: #252732;
+    --border-component: #2e3038;
+    --border-accent: #3b3c45;
+
+    --text-primary: #FFFFFF;
+    --text-secondary: #FAFAFA;
+    --text-tertiary: #F5F5F5;
+    --text-muted: #ADADAD;
+    --text-muted-dark: #858585;
+    --text-util: #474747;
+    --text-util-dark: #1F1F1F;
+
+    --accent-red: #FF4060;
+    --accent-orange: #FF7A00;
+    --accent-yellow: #FD9E16;
+    --accent-green: #00BA7C;
+    --accent-blue: #1D9BF0;
+    --accent-purple: #7856FF;
+
+    --font-body: 'Inter', 'Chiron GoRound TC', 'Noto Sans JP', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Chiron GoRound TC', 'Noto Sans JP', monospace;
+    --font-display: 'Space Grotesk', 'Chiron GoRound TC', 'Noto Sans JP', sans-serif;
+
+    --transition-speed-fast: 150ms;
+    --transition-speed-normal: 300ms;
+    --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    margin: 0;
+    overflow: hidden;
+}
