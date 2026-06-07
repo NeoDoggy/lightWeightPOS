@@ -2,7 +2,7 @@ const state = {
     active_view: 'selling',
     current_event_id: null,
     active_cart: [],
-    sidebar_collapsed: true
+    sidebar_collapsed: false
 };
 
 const listeners = new Map();

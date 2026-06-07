@@ -76,7 +76,7 @@
 }
 
 .cart-header {
-    padding: 1.2rem;
+    padding: 1.7rem;
     border-bottom: 1px solid var(--border-structural);
     font-weight: 600;
 }
@@ -303,11 +303,6 @@
     background-color: rgba(27, 146, 226,0.1);
 }
 
-.grid-section.edit-mode .set-card {
-    border: 1px dashed var(--border-accent);
-    background: transparent;
-}
-
 .grid-section.edit-mode .set-card:hover {
     border-color: var(--accent-purple);
     background-color: rgba(113, 81, 240,0.1);
@@ -352,8 +347,8 @@
 
 .set-card {
     border-color: var(--accent-purple);
-    background-color: rgba(113, 81, 240,0.1);
-    border: 1px solid var(--border-structural);
+    border: 1px dashed var(--border-accent);
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -379,7 +374,7 @@
 /* Modal Overlays and Cards */
 .modal-overlay {
     position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
+    top: 0; left: 0; width: 100dvw; height: 100dvh;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
     z-index: 2000;
@@ -501,7 +496,7 @@
 /* --- Mobile View Overrides --- */
 
 /* Sidebar Mobile Tabs */
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     #sidebar-container > div:first-child, 
     #sidebar-toggle {
         display: none !important; /* Hide title and toggle button */
@@ -577,7 +572,7 @@
     border: 2px solid var(--bg-base);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     .mobile-cart-fab { display: flex; }
 }
 
@@ -592,8 +587,55 @@
     padding: 0.5rem;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     .btn-close-cart { display: block; }
+}
+
+/* =========================================
+   TOAST NOTIFICATIONS (Non-blocking Alerts)
+   ========================================= */
+   #toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 10000;
+    pointer-events: none; /* Lets you click through the container */
+}
+
+.sys-toast {
+    background: var(--bg-surface);
+    border-left: 4px solid var(--accent-blue);
+    color: var(--text-primary);
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    pointer-events: auto; /* Re-enables clicking on the toast itself */
+    
+    /* Animation start state */
+    transform: translateX(120%);
+    opacity: 0;
+    transition: all var(--transition-speed-normal) var(--easing-standard);
+}
+
+.sys-toast.active {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* Status Colors */
+.sys-toast.success { border-left-color: var(--accent-green); color: var(--accent-green); }
+.sys-toast.error { border-left-color: var(--accent-red); color: var(--accent-red); }
+.sys-toast.warning { border-left-color: var(--accent-orange); color: var(--accent-orange); }
+
+.sys-toast span {
+    color: var(--text-primary); /* Keeps text white, only icons/borders are colored */
 }
 
 /* =========================================
@@ -654,73 +696,4 @@
     display: flex;
     justify-content: center;
     gap: 1rem;
-}
-
-/* =========================================
-   TOAST NOTIFICATIONS (Non-blocking Alerts)
-   ========================================= */
-#toast-container {
-    position: fixed;
-    top: 24px;
-    right: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    z-index: 10000;
-    pointer-events: none; /* Lets you click through the container */
-}
-
-.sys-toast {
-    background: var(--bg-surface);
-    border-left: 4px solid var(--accent-blue);
-    color: var(--text-primary);
-    padding: 1rem 1.5rem;
-    border-radius: 4px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    pointer-events: auto; /* Re-enables clicking on the toast itself */
-    
-    /* Animation start state */
-    transform: translateX(120%);
-    opacity: 0;
-    transition: all var(--transition-speed-normal) var(--easing-standard);
-}
-
-.sys-toast.active {
-    transform: translateX(0);
-    opacity: 1;
-}
-
-/* Status Colors */
-.sys-toast.success { border-left-color: var(--accent-green); color: var(--accent-green); }
-.sys-toast.error { border-left-color: var(--accent-red); color: var(--accent-red); }
-.sys-toast.warning { border-left-color: var(--accent-orange); color: var(--accent-orange); }
-
-.sys-toast span {
-    color: var(--text-primary); /* Keeps text white, only icons/borders are colored */
-}
-
-/* =========================================
-   SORTABLE.JS DRAG UTILITIES
-   ========================================= */
-   .sortable-ghost {
-    opacity: 0.4;
-    background: var(--bg-base) !important;
-    border: 2px dashed var(--border-accent) !important;
-}
-
-.sortable-drag {
-    cursor: grabbing !important;
-    opacity: 1 !important;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.6) !important;
-    border-color: var(--accent-blue) !important;
-    transform: scale(1.05);
-}
-
-/* Kills the edit-mode jiggle animation globally while a drag is happening */
-.grid-section.is-dragging .product-card {
-    animation: none !important; 
 }

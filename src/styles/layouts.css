@@ -1,7 +1,7 @@
 /* =========================================
-   CORE SHELL (PC & BASE LAYOUT)
+   1. CORE SHELL (PC & BASE LAYOUT)
    ========================================= */
-#app {
+   #app {
     display: flex;
     height: 100dvh;
     width: 100dvw;
@@ -31,16 +31,16 @@
     flex-direction: column;
     background-color: var(--bg-base);
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* Changed from auto: children handle their own scroll */
     height: 100vh;
 }
 
 /* =========================================
-   SELLING WORKSPACE (PC DEFAULT)
+   2. SELLING WORKSPACE (PC DEFAULT)
    ========================================= */
 .selling-workspace {
     display: flex;
-    flex-direction: row;
+    flex-direction: row; /* Strict side-by-side for PC */
     height: 100%;
     width: 100%;
     overflow: hidden;
@@ -49,12 +49,12 @@
 .grid-section {
     flex: 1;
     padding: 1.5rem;
-    overflow-y: auto;
+    overflow-y: auto; /* Grid scrolls independently */
 }
 
-
+/* Original PC Cart Style */
 .cart-section {
-    width: 380px;
+    width: 300px;
     background-color: var(--bg-surface);
     border-left: 1px solid var(--border-structural);
     display: flex;
@@ -65,17 +65,17 @@
 
 
 /* =========================================
-   TABLET OVERRIDES (FLOATING CART)
+   3. TABLET OVERRIDES (FLOATING CART)
    ========================================= */
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     .selling-workspace {
         display: block; 
     }
     
     .grid-section {
         height: 100%;
-        padding-bottom: 120px; 
-        overflow-y: auto;
+        padding-bottom: 120px; /* Keeps space so the Floating Button doesn't block products */
+        overflow-y: auto; /* Ensures the grid scrolls perfectly */
         box-sizing: border-box;
     }
     
@@ -83,16 +83,17 @@
         position: fixed;
         bottom: calc(70px + 1rem);
         right: 0;
-        height: calc(100dvh - 70px);
+        height: calc(100dvh - 70px); /* Fills screen down to the mobile nav bar */
         width: 85%;
         max-width: 400px;
         border-left: 1px solid var(--border-structural);
         border-bottom: 1px solid var(--border-structural);
-        border-radius: 16px 0 0 16px;
+        border-radius: 16px 0 0 16px; /* Rounds the bottom left corner cleanly */
         box-shadow: -10px 0 40px rgba(0,0,0,0.8);
         z-index: 1500;
         overflow: hidden; 
-
+        
+        /* Hidden state - pushed off screen to the right */
         transform: translateX(105%);
         transition: transform var(--transition-speed-normal) var(--easing-standard);
     }
@@ -104,9 +105,9 @@
 
 
 /* =========================================
-   MOBILE OVERRIDES (BOTTOM NAV BAR)
+   4. MOBILE OVERRIDES (BOTTOM NAV BAR)
    ========================================= */
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     #app {
         flex-direction: column;
     }
@@ -121,11 +122,11 @@
         justify-content: space-around;
         border-right: none;
         border-top: 1px solid var(--border-structural);
-        transform: none !important;
+        transform: none !important; /* Overrides the PC collapse transform */
         z-index: 2000;
     }
 
- 
+    /* Force full width on mobile even if state says 'collapsed' */
     #sidebar-container.collapsed {
         width: 100%;
     }
@@ -137,7 +138,7 @@
     
     .cart-section {
         bottom: 80px; 
-        height: 65vh;
+        height: 65vh; /* Maximize usable space on small phones */
     }
 }
 

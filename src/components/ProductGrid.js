@@ -1,5 +1,8 @@
 import { Store } from '../core/store.js';
 import { DB } from '../core/db.js';
+import { i18n } from '../core/i18n.js';
+import { Dialog } from '../core/dialog.js';
+import { Toast } from '../core/toast.js';
 
 export const initProductGrid = async (containerId) => {
     const container = document.getElementById(containerId);
@@ -33,51 +36,42 @@ export const initProductGrid = async (containerId) => {
     };
 
     const render = () => {
-        // 1. COMBINE AND SORT: Mix products and sets together based on sort_order
-        const combinedItems = [
-            ...products.map(p => ({ ...p, itemType: 'product' })),
-            ...sets.map(s => ({ ...s, itemType: 'set' }))
-        ].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
-
         container.innerHTML = `
             <div class="workspace-header">
                 <select class="event-selector" id="event-select">
                     ${events.map(e => `<option value="${e.id}" ${e.id === currentEventId ? 'selected' : ''}>${e.name}</option>`).join('')}
                 </select>
                 <div class="toggle-container">
-                    <span>Edit Mode</span>
+                    <span>${i18n.t('edit_toggle_label')}</span>
                     <div class="ios-toggle ${isEditMode ? 'active' : ''}" id="edit-toggle"></div>
                 </div>
             </div>
             
             <div class="products-container" id="grid-items">
-                ${combinedItems.map(item => {
-                    // 2. RENDER COMBINED ITEMS
-                    if (item.itemType === 'product') {
-                        const isSoldOut = item.stock_quantity <= 0;
-                        return `
-                            <div class="product-card" data-type="product" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" style="${isSoldOut && !isEditMode ? 'opacity: 0.5;' : ''}">
-                                <div class="delete-badge"><i class="fa-solid fa-xmark"></i></div>
-                                <div class="product-name">${item.name}</div>
-                                <div style="font-size:0.75rem; color:${isSoldOut ? 'var(--accent-red)' : 'var(--text-muted)'}; margin-top:0.2rem;">
-                                    ${isSoldOut ? 'SOLD OUT' : `Stock: ${item.stock_quantity}`}
-                                </div>
-                                <div class="product-price">$${item.price}</div>
+                ${products.map(p => {
+                    const isSoldOut = p.stock_quantity <= 0;
+                    return `
+                        <div class="product-card" data-type="product" data-id="${p.id}" data-name="${p.name}" data-price="${p.price}" style="${isSoldOut ? 'opacity: 0.5;' : ''}">
+                            <div class="delete-badge"><i class="fa-solid fa-xmark"></i></div>
+                            <div class="product-name">${p.name}</div>
+                            <div style="font-size:0.75rem; color:${isSoldOut ? 'var(--accent-red)' : 'var(--text-muted)'}; margin-top:0.2rem;">
+                                ${isSoldOut ? `${i18n.t('product_card_soldout')}` : `${i18n.t('product_card_stock')}: ${p.stock_quantity}`}
                             </div>
-                        `;
-                    } else {
-                        return `
-                            <div class="product-card" data-type="set" data-id="${item.id}">
-                                <div class="delete-badge"><i class="fa-solid fa-xmark"></i></div>
-                                <div>
-                                    <div class="set-indicator">BUNDLE SET</div>
-                                    <div class="product-name">${item.name}</div>
-                                </div>
-                                <div class="product-price">$${item.bundle_price}</div>
-                            </div>
-                        `;
-                    }
+                            <div class="product-price">$${p.price}</div>
+                        </div>
+                    `;
                 }).join('')}
+                
+                ${sets.map(s => `
+                    <div class="product-card" data-type="set" data-id="${s.id}">
+                        <div class="delete-badge"><i class="fa-solid fa-xmark"></i></div>
+                        <div>
+                            <div class="set-indicator">${i18n.t('set_car_label')}</div>
+                            <div class="product-name">${s.name}</div>
+                        </div>
+                        <div class="product-price">$${s.bundle_price}</div>
+                    </div>
+                `).join('')}
 
                 ${isEditMode ? `
                     <div class="product-card add-card" id="btn-add-product" title="Add Product"><i class="fa-solid fa-plus"></i></div>
@@ -88,26 +82,26 @@ export const initProductGrid = async (containerId) => {
             <div class="modal-overlay" id="modal-item">
                 <div class="modal-card">
                     <div class="modal-header">
-                        <span>Add New Item</span>
+                        <span>${i18n.t('add_item_title')}</span>
                         <button class="btn-close" onclick="document.getElementById('modal-item').classList.remove('active')"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Item Name</label>
-                        <input type="text" id="input-item-name" class="form-input" placeholder="e.g., Poster A">
+                        <label class="form-label">${i18n.t('add_item_name_title')}</label>
+                        <input type="text" id="input-item-name" class="form-input" placeholder="${i18n.t('add_item_name_placeholder')}">
                     </div>
                     <div style="display: flex; gap: 1rem;">
                         <div class="form-group" style="flex: 1;">
-                            <label class="form-label">Price</label>
+                            <label class="form-label">${i18n.t('add_item_price_title')}</label>
                             <input type="number" id="input-item-price" class="form-input" placeholder="0">
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label class="form-label">Initial Stock (Quant)</label>
+                            <label class="form-label">${i18n.t('add_item_stock_title')}</label>
                             <input type="number" id="input-item-quant" class="form-input" value="100">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn-cancel" onclick="document.getElementById('modal-item').classList.remove('active')">Cancel</button>
-                        <button class="btn-save" id="save-item-btn">Save Item</button>
+                        <button class="btn-cancel" onclick="document.getElementById('modal-item').classList.remove('active')">${i18n.t('add_item_cancle_button')}</button>
+                        <button class="btn-save" id="save-item-btn">${i18n.t('add_item_button')}</button>
                     </div>
                 </div>
             </div>
@@ -115,30 +109,30 @@ export const initProductGrid = async (containerId) => {
             <div class="modal-overlay" id="modal-set">
                 <div class="modal-card">
                     <div class="modal-header">
-                        <span>Configure Set Bundle</span>
+                        <span>${i18n.t('add_set_title')}</span>
                         <button class="btn-close" onclick="document.getElementById('modal-set').classList.remove('active')"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Set Name</label>
-                        <input type="text" id="input-set-name" class="form-input" placeholder="e.g., Full VIP Bundle">
+                        <label class="form-label">${i18n.t('add_set_name_title')}</label>
+                        <input type="text" id="input-set-name" class="form-input" placeholder="${i18n.t('add_set_name_placeholder')}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Set Price (Final Price, not discount)</label>
+                        <label class="form-label">${i18n.t('add_set_price_title')}</label>
                         <input type="number" id="input-set-price" class="form-input" placeholder="0">
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label" style="display: flex; justify-content: space-between;">
-                            <span>Included Items</span>
-                            <span id="btn-add-set-row" style="color: var(--accent-blue); cursor: pointer;"><i class="fa-solid fa-plus"></i> Add Item</span>
+                            <span>${i18n.t('add_set_included_items_title')}</span>
+                            <span id="btn-add-set-row" style="color: var(--accent-blue); cursor: pointer;"><i class="fa-solid fa-plus"></i> ${i18n.t('add_set_items_title')}</span>
                         </label>
                         <div id="set-items-container">
                             </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button class="btn-cancel" onclick="document.getElementById('modal-set').classList.remove('active')">Cancel</button>
-                        <button class="btn-save" id="save-set-btn">Save Set</button>
+                        <button class="btn-cancel" onclick="document.getElementById('modal-set').classList.remove('active')">${i18n.t('add_set_cancle_button')}</button>
+                        <button class="btn-save" id="save-set-btn">${i18n.t('add_set_button')}</button>
                     </div>
                 </div>
             </div>
@@ -152,7 +146,7 @@ export const initProductGrid = async (containerId) => {
         return `
             <div class="set-item-row">
                 <select class="form-select set-item-select" style="flex: 2;">
-                    <option value="" disabled ${!selectedId ? 'selected' : ''}>Select an item...</option>
+                    <option value="" disabled ${!selectedId ? 'selected' : ''}>${i18n.t('add_set_select_item_placeholder')}</option>
                     ${products.map(p => `<option value="${p.id}" ${p.id === selectedId ? 'selected' : ''}>${p.name} ($${p.price})</option>`).join('')}
                 </select>
                 <input type="number" class="form-input set-item-quant" style="flex: 1;" placeholder="Qty" min="1" value="${quant}">
@@ -162,48 +156,6 @@ export const initProductGrid = async (containerId) => {
     };
 
     const bindEvents = () => {
-        // --- 3. SORTABLE.JS ENGINE INIT ---
-        const gridItems = document.getElementById('grid-items');
-        if (gridItems && window.Sortable) {
-            if (window.gridSortable) window.gridSortable.destroy(); // Clean up old instance
-            
-            window.gridSortable = new Sortable(gridItems, {
-                animation: 200, 
-                disabled: !isEditMode, // Only drag when Edit Mode is ON
-                draggable: '.product-card[data-id]', // Exclude the "Add" buttons
-                ghostClass: 'sortable-ghost',
-                dragClass: 'sortable-drag',
-                
-                onStart: () => {
-                    const gridSection = document.querySelector('.grid-section');
-                    if(gridSection) gridSection.classList.add('is-dragging');
-                },
-                
-                onEnd: async (evt) => {
-                    const gridSection = document.querySelector('.grid-section');
-                    if(gridSection) gridSection.classList.remove('is-dragging');
-
-                    if (evt.oldIndex === evt.newIndex) return;
-
-                    const cards = [...gridItems.querySelectorAll('.product-card[data-id]')];
-                    for (let i = 0; i < cards.length; i++) {
-                        const id = cards[i].getAttribute('data-id');
-                        const type = cards[i].getAttribute('data-type');
-                        const storeName = type === 'set' ? 'product_sets' : 'products';
-                        
-                        const dbItem = await DB.execute(storeName, 'readonly', 'get', id);
-                        if (dbItem && dbItem.sort_order !== i) {
-                            dbItem.sort_order = i;
-                            await DB.execute(storeName, 'readwrite', 'put', dbItem);
-                        }
-                    }
-                    
-                    await loadData(); 
-                    render();
-                }
-            });
-        }
-
         document.getElementById('event-select').addEventListener('change', async (e) => {
             currentEventId = e.target.value;
             Store.set('current_event_id', currentEventId);
@@ -240,13 +192,15 @@ export const initProductGrid = async (containerId) => {
                     
                     if (type === 'product') {
                         const item = products.find(p => p.id === id);
+                        Store.set('sidebar_collapsed', true);
                         document.getElementById('input-item-name').value = item.name;
                         document.getElementById('input-item-price').value = item.price;
                         document.getElementById('input-item-quant').value = item.stock_quantity;
-                        document.querySelector('#modal-item .modal-header span').innerText = 'Edit Item';
+                        document.querySelector('#modal-item .modal-header span').innerText = i18n.t('add_item_edit_title');
                         document.getElementById('modal-item').classList.add('active');
                     } else if (type === 'set') {
                         const set = sets.find(s => s.id === id);
+                        Store.set('sidebar_collapsed', true);
                         document.getElementById('input-set-name').value = set.name;
                         document.getElementById('input-set-price').value = set.bundle_price;
                         
@@ -256,14 +210,17 @@ export const initProductGrid = async (containerId) => {
                             setContainer.insertAdjacentHTML('beforeend', getSetRowHTML(req.id, req.quant));
                         });
                         
-                        document.querySelector('#modal-set .modal-header span').innerText = 'Edit Set Bundle';
+                        document.querySelector('#modal-set .modal-header span').innerText = i18n.t('add_set_edit_title');
                         document.getElementById('modal-set').classList.add('active');
                     }
                 } else {
                     if (type === 'set') return alert('Add individual items to the cart. Sets auto-apply!');
                     
                     const product = products.find(p => p.id === id);
-                    if (product.stock_quantity <= 0) return alert('This item is sold out!');
+                    if (product.stock_quantity <= 0) {
+                        await Dialog.alert('This item is currently sold out.', 'Out of Stock');
+                        return;
+                    }
 
                     const name = card.getAttribute('data-name');
                     const price = parseInt(card.getAttribute('data-price'), 10);
@@ -284,13 +241,14 @@ export const initProductGrid = async (containerId) => {
             });
         });
 
+        // Open Modals
         if (document.getElementById('btn-add-product')) {
             document.getElementById('btn-add-product').addEventListener('click', () => {
-                editingId = null;
+                Store.set('sidebar_collapsed', true);
                 document.getElementById('input-item-name').value = '';
                 document.getElementById('input-item-price').value = '';
                 document.getElementById('input-item-quant').value = '100';
-                document.querySelector('#modal-item .modal-header span').innerText = 'Add New Item';
+                document.querySelector('#modal-item .modal-header span').innerText = i18n.t('add_item_title');
                 document.getElementById('modal-item').classList.add('active');
             });
         }
@@ -299,14 +257,16 @@ export const initProductGrid = async (containerId) => {
             document.getElementById('btn-add-set').addEventListener('click', () => {
                 if(products.length === 0) return alert('You must add items before creating a set.');
                 editingId = null;
+                Store.set('sidebar_collapsed', true);
                 document.getElementById('input-set-name').value = '';
                 document.getElementById('input-set-price').value = '';
                 document.getElementById('set-items-container').innerHTML = getSetRowHTML();
-                document.querySelector('#modal-set .modal-header span').innerText = 'Configure Set Bundle';
+                document.querySelector('#modal-set .modal-header span').innerText = i18n.t('add_set_title');
                 document.getElementById('modal-set').classList.add('active');
             });
         }
 
+        // Set Modal Dynamic Rows
         const setContainer = document.getElementById('set-items-container');
         if (setContainer) {
             document.getElementById('btn-add-set-row').addEventListener('click', () => {
@@ -329,15 +289,12 @@ export const initProductGrid = async (containerId) => {
                 
                 if (!name || isNaN(price) || isNaN(quant)) return alert('Fill all fields correctly.');
 
-                // 4. PRESERVE SORT ORDER ON SAVE
-                const existingItem = editingId ? products.find(p => p.id === editingId) : null;
                 const payload = {
                     id: editingId || `p_${Date.now()}`, 
                     event_id: currentEventId, 
                     name, 
                     price, 
-                    stock_quantity: quant,
-                    sort_order: existingItem ? existingItem.sort_order : Date.now() // Put new items at the end
+                    stock_quantity: quant
                 };
 
                 await DB.execute('products', 'readwrite', editingId ? 'put' : 'add', payload);
@@ -345,6 +302,7 @@ export const initProductGrid = async (containerId) => {
                 document.getElementById('modal-item').classList.remove('active');
                 await loadData();
                 render();
+                Toast.show(editingId ? 'Item updated!' : 'New item created!', 'success');
             });
         }
 
@@ -367,15 +325,12 @@ export const initProductGrid = async (containerId) => {
 
                 if(!valid || included_items.length === 0) return alert('Select items and quantities properly.');
 
-                // 4. PRESERVE SORT ORDER ON SAVE
-                const existingSet = editingId ? sets.find(s => s.id === editingId) : null;
                 const payload = {
                     id: editingId || `s_${Date.now()}`, 
                     event_id: currentEventId, 
                     name, 
                     bundle_price: price, 
-                    included_items,
-                    sort_order: existingSet ? existingSet.sort_order : Date.now() // Put new sets at the end
+                    included_items
                 };
 
                 await DB.execute('product_sets', 'readwrite', editingId ? 'put' : 'add', payload);

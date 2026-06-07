@@ -1,6 +1,7 @@
 import { Store } from '../core/store.js';
 import { DB } from '../core/db.js';
 import { Logger } from '../core/logger.js';
+import { i18n } from '../core/i18n.js';
 import { Dialog } from '../core/dialog.js';
 import { Toast } from '../core/toast.js';
 
@@ -72,14 +73,14 @@ export const initCart = async (containerId) => {
 
         container.innerHTML = `
             <div class="cart-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <span>Active Order</span>
+                <span>${i18n.t('cart_title')}</span>
                 <div style="display: flex; align-items: center; gap: 1rem;">
                     ${cartItems.length > 0 ? `<button id="btn-clear-cart" style="background: transparent; border: none; color: var(--accent-red); cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.3rem;"><i class="fa-solid fa-trash-can"></i> Clear</button>` : ''}
                     <button class="btn-close-cart" id="btn-close-cart"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
             </div>
             <div class="cart-items-list">
-                ${cartItems.length === 0 ? '<div style="color:var(--text-muted); text-align:center; padding-top:2rem;">Cart Empty</div>' : ''}
+                ${cartItems.length === 0 ? `<div style="color:var(--text-muted); text-align:center; padding-top:2rem;">${i18n.t('cart_empty_placeholder')}</div>` : ''}
                 ${cartItems.map(item => `
                     <div class="cart-item-row">
                         <div>
@@ -96,7 +97,7 @@ export const initCart = async (containerId) => {
 
                 ${appliedSets.length > 0 ? `
                     <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(120, 86, 255, 0.1); border: 1px solid var(--accent-purple); border-radius: 4px;">
-                        <div style="color: var(--accent-purple); font-size: 0.8rem; font-weight: bold; margin-bottom: 0.5rem;">Auto-Applied Sets</div>
+                        <div style="color: var(--accent-purple); font-size: 0.8rem; font-weight: bold; margin-bottom: 0.5rem;">${i18n.t('cart_apply_set_label')}</div>
                         ${appliedSets.map(s => `
                             <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
                                 <span>${s.name}</span>
@@ -108,11 +109,11 @@ export const initCart = async (containerId) => {
             </div>
             <div class="cart-footer">
                 <div class="total-row">
-                    <span>Total</span>
+                    <span>${i18n.t('cart_total_label')}</span>
                     <span style="color:var(--accent-yellow);">$${finalTotal}</span>
                 </div>
                 <button class="checkout-submit-btn" ${cartItems.length === 0 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
-                    Complete Transaction
+                    ${i18n.t('cart_checkout_button')}
                 </button>
             </div>
         `;
@@ -130,7 +131,6 @@ export const initCart = async (containerId) => {
         const clearBtn = container.querySelector('#btn-clear-cart');
         if (clearBtn) {
             clearBtn.addEventListener('click', async () => {
-                // Replaced native confirm
                 const isConfirmed = await Dialog.confirm('Are you sure you want to clear all items from the current order?', 'Clear Order');
                 if (isConfirmed) {
                     Store.set('active_cart', []);
@@ -168,36 +168,6 @@ export const initCart = async (containerId) => {
         const submitBtn = container.querySelector('.checkout-submit-btn');
         if (submitBtn && cartItems.length > 0) {
             submitBtn.addEventListener('click', async () => {
-                
-                let stockError = false;
-                let errorMessages = [];
-                let correctedCart = [...cartItems];
-
-                for (let i = 0; i < correctedCart.length; i++) {
-                    const item = correctedCart[i];
-                    const dbItem = await DB.execute('products', 'readonly', 'get', item.id);
-                    
-                    if (!dbItem) {
-                        stockError = true;
-                        errorMessages.push(`- ${item.name} was removed from the system.`);
-                        correctedCart[i].quantity = 0;
-                    } else if (item.quantity > dbItem.stock_quantity) {
-                        stockError = true;
-                        errorMessages.push(`- ${item.name} (Requested: ${item.quantity}, Available: ${dbItem.stock_quantity})`);
-                        correctedCart[i].quantity = dbItem.stock_quantity;
-                    }
-                }
-                if (stockError) {
-                    const finalCart = correctedCart.filter(item => item.quantity > 0);
-                    Store.set('active_cart', finalCart);
-                    
-                    await Dialog.alert(
-                        `Transaction halted due to background stock changes:\n\n${errorMessages.join('\n')}\n\nYour cart has been automatically adjusted.`, 
-                        'Inventory Error'
-                    );
-                    return;
-                }
-
                 const orderData = {
                     id: `ord_${Date.now()}`,
                     event_id: Store.get('current_event_id'),
@@ -218,12 +188,12 @@ export const initCart = async (containerId) => {
                 
                 Store.set('active_cart', []);
                 Store.set('force_grid_refresh', Date.now());
-
-                Toast.show('Transaction completed successfully!', 'success');
                 
                 // Hide drawer after successful mobile checkout
                 container.classList.remove('mobile-open'); 
                 
+                Toast.show('Transaction Completed!', 'success');
+
                 const originalText = submitBtn.innerText;
                 submitBtn.innerText = "Success!";
                 submitBtn.style.backgroundColor = "var(--accent-blue)";

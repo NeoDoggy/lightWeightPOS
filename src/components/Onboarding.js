@@ -4,7 +4,7 @@ import { Store } from '../core/store.js';
 export const Onboarding = {
     steps: [
         { target: '#sidebar-container', titleKey: 'tour_step1_title', descKey: 'tour_step1_desc', position: 'right' },
-        { target: '.grid-section', titleKey: 'tour_step2_title', descKey: 'tour_step2_desc', position: 'right' },
+        { target: '.grid-section', titleKey: 'tour_step2_title', descKey: 'tour_step2_desc', position: 'inright' },
         { target: '.cart-section', titleKey: 'tour_step3_title', descKey: 'tour_step3_desc', position: 'left' },
         { target: '[data-view="settings"]', titleKey: 'tour_step4_title', descKey: 'tour_step4_desc', position: 'right' }
     ],
@@ -174,9 +174,14 @@ export const Onboarding = {
                 if (step.position === 'right') {
                     tooltip.style.top = `${Math.max(20, rect.top)}px`;
                     tooltip.style.left = `${rect.right + 24}px`;
-                } else if (step.position === 'left') {
+                } 
+                else if (step.position === 'left') {
                     tooltip.style.top = `${Math.max(20, rect.top)}px`;
                     tooltip.style.left = `${rect.left - tooltip.offsetWidth - 24}px`;
+                }
+                else if (step.position === 'inright') {
+                    tooltip.style.top = `${rect.top + rect.height / 2 - tooltip.offsetHeight / 2}px`;
+                    tooltip.style.left = `${rect.right - tooltip.offsetWidth - 16}px`;
                 }
             }
 
