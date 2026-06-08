@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lw-pos-cache-v1.0.1';
+const CACHE_NAME = 'lwPosCache-v1.0.2';
 const CORE_ASSETS = [
     './',
     './index.html',

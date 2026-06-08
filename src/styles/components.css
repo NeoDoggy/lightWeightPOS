@@ -697,3 +697,18 @@
     justify-content: center;
     gap: 1rem;
 }
+
+/* Sortable.js */
+.grid-section.edit-mode .product-card:not(.add-card):not(.set-card) {
+    cursor: grab;
+}
+
+.grid-section.edit-mode .product-card:active {
+    cursor: grabbing;
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+    border: 2px dashed var(--accent-blue) !important;
+    background: transparent !important;
+}

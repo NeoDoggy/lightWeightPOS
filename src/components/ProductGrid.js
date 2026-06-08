@@ -5,6 +5,7 @@ import { Dialog } from '../core/dialog.js';
 import { Toast } from '../core/toast.js';
 
 export const initProductGrid = async (containerId) => {
+    let sortableInstance = null;
     const container = document.getElementById(containerId);
     if (!container) return;
 
@@ -31,8 +32,45 @@ export const initProductGrid = async (containerId) => {
     const loadData = async () => {
         const allProducts = await DB.execute('products', 'readonly', 'getAll');
         const allSets = await DB.execute('product_sets', 'readonly', 'getAll');
-        products = allProducts.filter(p => p.event_id === currentEventId);
-        sets = allSets.filter(s => s.event_id === currentEventId);
+        products = allProducts
+            .filter(p => p.event_id === currentEventId)
+            .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+            
+        sets = allSets
+            .filter(s => s.event_id === currentEventId)
+            .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+    };
+
+    const initSortable = () => {
+        const grid = document.getElementById('grid-items');
+        if (!grid) return;
+
+        if (sortableInstance) {
+            sortableInstance.destroy();
+        }
+
+        sortableInstance = new Sortable(grid, {
+            disabled: !isEditMode, 
+            animation: 150,        
+            filter: '.add-card, .set-card', 
+            ghostClass: 'sortable-ghost',   
+            
+            onEnd: async (evt) => {
+                const itemCards = grid.querySelectorAll('.product-card:not(.add-card):not(.set-card)');
+                for (let index = 0; index < itemCards.length; index++) {
+                    const card = itemCards[index];
+                    const id = card.getAttribute('data-id');
+                    const type = card.getAttribute('data-type');
+                    const storeName = type === 'set' ? 'product_sets' : 'products';
+                    const item = await DB.execute(storeName, 'readonly', 'get', id);
+                    if (item) {
+                        item.sort_order = index;
+                        await DB.execute(storeName, 'readwrite', 'put', item);
+                    }
+                }  
+                await loadData();
+            }
+        });
     };
 
     const render = () => {
@@ -140,6 +178,7 @@ export const initProductGrid = async (containerId) => {
         
         container.classList.toggle('edit-mode', isEditMode);
         bindEvents();
+        initSortable();
     };
 
     const getSetRowHTML = (selectedId = '', quant = 1) => {
@@ -169,7 +208,7 @@ export const initProductGrid = async (containerId) => {
             render();
         });
 
-        // Grid Interaction
+        
         container.querySelectorAll('.product-card').forEach(card => {
             if (card.classList.contains('add-card')) return;
 
@@ -241,7 +280,7 @@ export const initProductGrid = async (containerId) => {
             });
         });
 
-        // Open Modals
+        
         if (document.getElementById('btn-add-product')) {
             document.getElementById('btn-add-product').addEventListener('click', () => {
                 editingId = null;
@@ -267,7 +306,7 @@ export const initProductGrid = async (containerId) => {
             });
         }
 
-        // Set Modal Dynamic Rows
+        
         const setContainer = document.getElementById('set-items-container');
         if (setContainer) {
             document.getElementById('btn-add-set-row').addEventListener('click', () => {
@@ -280,7 +319,7 @@ export const initProductGrid = async (containerId) => {
             });
         }
 
-        // Save Item
+        
         const saveItemBtn = document.getElementById('save-item-btn');
         if (saveItemBtn) {
             saveItemBtn.addEventListener('click', async () => {
