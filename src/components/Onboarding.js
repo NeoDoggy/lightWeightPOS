@@ -6,10 +6,13 @@ export const Onboarding = {
         { target: '#sidebar-container', titleKey: 'tour_start_title', descKey: 'tour_start_desc', position: 'right' },
         { target: '.grid-section', titleKey: 'tour_grid_1_title', descKey: 'tour_grid_1_desc', position: 'inright' },
         { target: '.cart-section', titleKey: 'tour_grid_2_title', descKey: 'tour_grid_2_desc', position: 'left' },
+        { target: '#event-select', titleKey: 'tour_grid_3_title', descKey: 'tour_grid_3_desc', position: 'right' },
+        { target: '#grid-edit-id', titleKey: 'tour_grid_4_title', descKey: 'tour_grid_4_desc', position: 'left' },
         { target: '[data-view="dashboard"]', titleKey: 'tour_dash_1_title', descKey: 'tour_dash_1_desc', position: 'right' },
         { target: '#dashboard-todays-total-id', titleKey: 'tour_dash_2_title', descKey: 'tour_dash_2_desc', position: 'right' },
         { target: '#dashboard-todays-order-id', titleKey: 'tour_dash_3_title', descKey: 'tour_dash_3_desc', position: 'left' },
         { target: '#dashboard-order-his-id', titleKey: 'tour_dash_4_title', descKey: 'tour_dash_4_desc', position: 'inright' },
+        { target: '#dashboard-event-select', titleKey: 'tour_dash_5_title', descKey: 'tour_dash_5_desc', position: 'left' },
         { target: '[data-view="settings"]', titleKey: 'tour_sett_1_title', descKey: 'tour_sett_1_desc', position: 'right' },
         { target: '#settings-event-id', titleKey: 'tour_sett_2_title', descKey: 'tour_sett_2_desc', position: 'inright' },
         { target: '#settings-data-sync-id', titleKey: 'tour_sett_3_title', descKey: 'tour_sett_3_desc', position: 'inright' },
@@ -151,11 +154,11 @@ export const Onboarding = {
             }
         }
 
-        if(Onboarding.currentStep === 3 && step.target === '[data-view="dashboard"]') {
+        if(step.target === '[data-view="dashboard"]') {
             Store.set('active_view', 'dashboard');
         }
 
-        if(Onboarding.currentStep === 7 && step.target === '[data-view="settings"]') {
+        if(step.target === '[data-view="settings"]') {
             Store.set('active_view', 'settings');
         }
 

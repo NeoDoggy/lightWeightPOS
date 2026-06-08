@@ -41,7 +41,7 @@ export const initProductGrid = async (containerId) => {
                 <select class="event-selector" id="event-select">
                     ${events.map(e => `<option value="${e.id}" ${e.id === currentEventId ? 'selected' : ''}>${e.name}</option>`).join('')}
                 </select>
-                <div class="toggle-container">
+                <div id="grid-edit-id" class="toggle-container">
                     <span>${i18n.t('edit_toggle_label')}</span>
                     <div class="ios-toggle ${isEditMode ? 'active' : ''}" id="edit-toggle"></div>
                 </div>

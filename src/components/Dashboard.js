@@ -6,26 +6,42 @@ export const initDashboard = async (containerId) => {
     const container = document.getElementById(containerId);
     if (!container) return;
 
+    
+    let selectedEventId = 'all';
+
     const renderDashboard = async () => {
         try {
-            const orders = await DB.execute('orders', 'readonly', 'getAll');
+            const allOrders = await DB.execute('orders', 'readonly', 'getAll');
             const events = await DB.execute('events', 'readonly', 'getAll');
             
-            // Map event IDs to names for quick UI lookup
+            
             const eventMap = {};
             events.forEach(e => { eventMap[e.id] = e.name; });
 
-            // Sort newest to oldest
-            const sortedOrders = orders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             
-            // Calculate Today's Metrics
+            let filteredOrders = allOrders;
+            if (selectedEventId !== 'all') {
+                filteredOrders = allOrders.filter(o => o.event_id === selectedEventId);
+            }
+
+            
+            const sortedOrders = filteredOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            
             const today = new Date().toDateString();
             const todayOrders = sortedOrders.filter(o => new Date(o.timestamp).toDateString() === today);
             const todayRevenue = todayOrders.reduce((sum, o) => sum + o.total_amount, 0);
 
             container.innerHTML = `
                 <div style="padding: 1.5rem; max-width: 1200px; margin: 0 auto;">
-                    <h2 style="font-family: var(--font-display); margin-top: 0;">${i18n.t('dashboard_title')}</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 style="font-family: var(--font-display); margin: 0;">${i18n.t('dashboard_title')}</h2>
+                        
+                        <select class="event-selector" id="dashboard-event-select">
+                            <option value="all" ${selectedEventId === 'all' ? 'selected' : ''}>${i18n.t('dashboard_event_choose_placeholder')}</option>
+                            ${events.map(e => `<option value="${e.id}" ${e.id === selectedEventId ? 'selected' : ''}>${e.name}</option>`).join('')}
+                        </select>
+                    </div>
                     
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
                         <div id="dashboard-todays-total-id" style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px;">
@@ -81,12 +97,23 @@ export const initDashboard = async (containerId) => {
 
     const bindEvents = () => {
         const containerEl = document.getElementById(containerId);
+        
+        
+        const eventSelect = containerEl.querySelector('#dashboard-event-select');
+        if (eventSelect) {
+            eventSelect.addEventListener('change', (e) => {
+                selectedEventId = e.target.value;
+                renderDashboard();
+            });
+        }
+
+        
         containerEl.querySelectorAll('.btn-delete-log').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const orderId = e.currentTarget.getAttribute('data-id');
                 if (confirm('Delete this transaction log? (Note: This will not restore inventory stock)')) {
                     await DB.execute('orders', 'readwrite', 'delete', orderId);
-                    // Re-render the dashboard immediately
+                    
                     renderDashboard();
                 }
             });
