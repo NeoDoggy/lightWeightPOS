@@ -1,3 +1,5 @@
+import { i18n } from "./i18n.js";
+
 export const Dialog = {
     create: (title, message, isConfirm = false) => {
         return new Promise((resolve) => {
@@ -8,8 +10,8 @@ export const Dialog = {
                     <div class="sys-dialog-title">${title}</div>
                     <div class="sys-dialog-msg">${message}</div>
                     <div class="sys-dialog-actions">
-                        ${isConfirm ? `<button class="btn-cancel" id="sys-dialog-cancel">Cancel</button>` : ''}
-                        <button class="btn-save" id="sys-dialog-ok">OK</button>
+                        ${isConfirm ? `<button class="btn-cancel" id="sys-dialog-cancel">${i18n.t('dialog_cancel_button')}</button>` : ''}
+                        <button class="btn-save" id="sys-dialog-ok">${i18n.t('dialog_confirm_button')}</button>
                     </div>
                 </div>
             `;

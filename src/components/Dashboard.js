@@ -28,18 +28,18 @@ export const initDashboard = async (containerId) => {
                     <h2 style="font-family: var(--font-display); margin-top: 0;">${i18n.t('dashboard_title')}</h2>
                     
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-                        <div style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px;">
+                        <div id="dashboard-todays-total-id" style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px;">
                             <div style="color: var(--text-muted); font-size: 0.9rem;">${i18n.t('dashboard_rev_title')}</div>
                             <div style="font-family: var(--font-mono); font-size: 1.8rem; color: var(--accent-green); margin-top: 0.5rem;">$${todayRevenue}</div>
                         </div>
-                        <div style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px;">
+                        <div id="dashboard-todays-order-id" style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px;">
                             <div style="color: var(--text-muted); font-size: 0.9rem;">${i18n.t('dashboard_trans_count_title')}</div>
                             <div style="font-family: var(--font-mono); font-size: 1.8rem; color: var(--accent-blue); margin-top: 0.5rem;">${todayOrders.length}</div>
                         </div>
                     </div>
 
                     <h3 style="font-family: var(--font-display); border-bottom: 1px solid var(--border-structural); padding-bottom: 0.5rem;">${i18n.t('dashboard_trans_his_title')}</h3>
-                    <div style="background: var(--bg-surface); border: 1px solid var(--border-structural); border-radius: 4px; overflow: hidden;">
+                    <div id="dashboard-order-his-id" style="background: var(--bg-surface); border: 1px solid var(--border-structural); border-radius: 4px; overflow: hidden;">
                     ${sortedOrders.length === 0 ? `<div style="padding: 1rem; color: var(--text-muted);">${i18n.t('dashboard_trans_his_none_placeholder')}</div>` : ''}
                         ${sortedOrders.map(order => {
                             const eventName = eventMap[order.event_id] || 'Deleted Event';

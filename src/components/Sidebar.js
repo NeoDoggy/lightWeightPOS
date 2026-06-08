@@ -38,18 +38,26 @@ export const initSidebar = (containerId) => {
     const bindEvents = () => {
         const toggleBtn = container.querySelector('#sidebar-toggle');
         toggleBtn.addEventListener('click', () => {
-            // Toggle the global state instead of a local variable
             const currentState = Store.get('sidebar_collapsed');
             Store.set('sidebar_collapsed', !currentState);
         });
 
         const navItems = container.querySelectorAll('.nav-item[data-view]');
+        
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 const targetView = e.currentTarget.getAttribute('data-view');
-                navItems.forEach(nav => nav.classList.remove('active'));
-                e.currentTarget.classList.add('active');
                 Store.set('active_view', targetView);
+            });
+        });
+
+        Store.subscribe('active_view', (newView) => {
+            navItems.forEach(nav => {
+                if (nav.getAttribute('data-view') === newView) {
+                    nav.classList.add('active');
+                } else {
+                    nav.classList.remove('active');
+                }
             });
         });
     };

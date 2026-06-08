@@ -18,7 +18,7 @@ export const initProductGrid = async (containerId) => {
     const seedData = async () => {
         events = await DB.execute('events', 'readonly', 'getAll');
         if (events.length === 0) {
-            const defaultEvent = { id: `evt_${Date.now()}`, name: 'Defualt', timestamp: new Date().toISOString() };
+            const defaultEvent = { id: `evt_${Date.now()}`, name: i18n.t('event_default_name'), timestamp: new Date().toISOString() };
             await DB.execute('events', 'readwrite', 'add', defaultEvent);
             events.push(defaultEvent);
         }
@@ -244,6 +244,7 @@ export const initProductGrid = async (containerId) => {
         // Open Modals
         if (document.getElementById('btn-add-product')) {
             document.getElementById('btn-add-product').addEventListener('click', () => {
+                editingId = null;
                 Store.set('sidebar_collapsed', true);
                 document.getElementById('input-item-name').value = '';
                 document.getElementById('input-item-price').value = '';
@@ -299,10 +300,12 @@ export const initProductGrid = async (containerId) => {
 
                 await DB.execute('products', 'readwrite', editingId ? 'put' : 'add', payload);
                 
+                editingId = null;
+
                 document.getElementById('modal-item').classList.remove('active');
                 await loadData();
                 render();
-                Toast.show(editingId ? 'Item updated!' : 'New item created!', 'success');
+                Toast.show(editingId ? i18n.t('update_item_title') : i18n.t('create_item_title'), 'success');
             });
         }
 

@@ -20,7 +20,7 @@ export const initSettings = async (containerId) => {
             <div style="padding: 1.5rem; max-width: 800px; margin: 0 auto;">
                 <h2 style="font-family: var(--font-display); margin-top: 0;">${i18n.t('settings_title')}</h2>
                 
-                <div style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px; margin-bottom: 1.5rem;">
+                <div id="settings-event-id" style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px; margin-bottom: 1.5rem;">
                     <h3 style="margin-top: 0; font-family: var(--font-display);">${i18n.t('settings_event_mgmt_title')}</h3>
                     
                     <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
@@ -40,7 +40,7 @@ export const initSettings = async (containerId) => {
                     </div>
                 </div>
 
-                <div style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px; margin-bottom: 1.5rem;">
+                <div id="settings-data-sync-id" style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px; margin-bottom: 1.5rem;">
                     <h3 style="margin-top: 0; font-family: var(--font-display);">${i18n.t('settings_data_sync_title')}</h3>
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">${i18n.t('settings_data_sync_desc')}</p>
                     <div style="display: flex; gap: 1rem;">
@@ -50,7 +50,7 @@ export const initSettings = async (containerId) => {
                     </div>
                 </div>
 
-                <div style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px; margin-bottom: 1.5rem;">
+                <div id="settings-lang-id" style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px; margin-bottom: 1.5rem;">
                     <h3 style="margin-top: 0; font-family: var(--font-display);">${i18n.t('settings_language_title')}</h3>
                     
                     <select id="lang-selector" class="form-select" style="max-width: 200px; cursor: pointer;">
@@ -59,7 +59,7 @@ export const initSettings = async (containerId) => {
                     </select>
                 </div>
 
-                <div style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px;">
+                <div id="settings-replay-id" style="background: var(--bg-surface); padding: 1.5rem; border: 1px solid var(--border-structural); border-radius: 4px;">
                     <h3 style="margin-top: 0; font-family: var(--font-display);">${i18n.t('settings_tutorial_title')}</h3>
                     <button id="btn-replay-tour" style="padding: 0.75rem 1.5rem; background: var(--border-component); border: 1px solid var(--border-accent); color: white; border-radius: 4px; cursor: pointer;"><i class="fa-solid fa-circle-play"></i> ${i18n.t('settings_replay_tour_button')}</button>
                 </div>

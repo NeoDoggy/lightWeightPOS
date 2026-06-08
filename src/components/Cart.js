@@ -75,7 +75,7 @@ export const initCart = async (containerId) => {
             <div class="cart-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <span>${i18n.t('cart_title')}</span>
                 <div style="display: flex; align-items: center; gap: 1rem;">
-                    ${cartItems.length > 0 ? `<button id="btn-clear-cart" style="background: transparent; border: none; color: var(--accent-red); cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.3rem;"><i class="fa-solid fa-trash-can"></i> Clear</button>` : ''}
+                    ${cartItems.length > 0 ? `<button id="btn-clear-cart" style="background: transparent; border: none; color: var(--accent-red); cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.3rem;"><i class="fa-solid fa-trash-can"></i> ${i18n.t('cart_delete_button')}</button>` : ''}
                     <button class="btn-close-cart" id="btn-close-cart"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
             </div>
@@ -131,7 +131,7 @@ export const initCart = async (containerId) => {
         const clearBtn = container.querySelector('#btn-clear-cart');
         if (clearBtn) {
             clearBtn.addEventListener('click', async () => {
-                const isConfirmed = await Dialog.confirm('Are you sure you want to clear all items from the current order?', 'Clear Order');
+                const isConfirmed = await Dialog.confirm(i18n.t('clear_cart_confirm_message'), i18n.t('clear_cart_confirm_title'));
                 if (isConfirmed) {
                     Store.set('active_cart', []);
                 }
@@ -192,7 +192,7 @@ export const initCart = async (containerId) => {
                 // Hide drawer after successful mobile checkout
                 container.classList.remove('mobile-open'); 
                 
-                Toast.show('Transaction Completed!', 'success');
+                Toast.show(i18n.t('order_success_title'), 'success');
 
                 const originalText = submitBtn.innerText;
                 submitBtn.innerText = "Success!";

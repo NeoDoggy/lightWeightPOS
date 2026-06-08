@@ -3,10 +3,18 @@ import { Store } from '../core/store.js';
 
 export const Onboarding = {
     steps: [
-        { target: '#sidebar-container', titleKey: 'tour_step1_title', descKey: 'tour_step1_desc', position: 'right' },
-        { target: '.grid-section', titleKey: 'tour_step2_title', descKey: 'tour_step2_desc', position: 'inright' },
-        { target: '.cart-section', titleKey: 'tour_step3_title', descKey: 'tour_step3_desc', position: 'left' },
-        { target: '[data-view="settings"]', titleKey: 'tour_step4_title', descKey: 'tour_step4_desc', position: 'right' }
+        { target: '#sidebar-container', titleKey: 'tour_start_title', descKey: 'tour_start_desc', position: 'right' },
+        { target: '.grid-section', titleKey: 'tour_grid_1_title', descKey: 'tour_grid_1_desc', position: 'inright' },
+        { target: '.cart-section', titleKey: 'tour_grid_2_title', descKey: 'tour_grid_2_desc', position: 'left' },
+        { target: '[data-view="dashboard"]', titleKey: 'tour_dash_1_title', descKey: 'tour_dash_1_desc', position: 'right' },
+        { target: '#dashboard-todays-total-id', titleKey: 'tour_dash_2_title', descKey: 'tour_dash_2_desc', position: 'right' },
+        { target: '#dashboard-todays-order-id', titleKey: 'tour_dash_3_title', descKey: 'tour_dash_3_desc', position: 'left' },
+        { target: '#dashboard-order-his-id', titleKey: 'tour_dash_4_title', descKey: 'tour_dash_4_desc', position: 'inright' },
+        { target: '[data-view="settings"]', titleKey: 'tour_sett_1_title', descKey: 'tour_sett_1_desc', position: 'right' },
+        { target: '#settings-event-id', titleKey: 'tour_sett_2_title', descKey: 'tour_sett_2_desc', position: 'inright' },
+        { target: '#settings-data-sync-id', titleKey: 'tour_sett_3_title', descKey: 'tour_sett_3_desc', position: 'inright' },
+        { target: '#settings-lang-id', titleKey: 'tour_sett_4_title', descKey: 'tour_sett_4_desc', position: 'inright' },
+        { target: '#settings-replay-id', titleKey: 'tour_end_title', descKey: 'tour_end_desc', position: 'inright' }
     ],
     
     currentStep: 0,
@@ -50,6 +58,7 @@ export const Onboarding = {
             
             document.getElementById('btn-welcome-skip').addEventListener('click', () => {
                 document.getElementById('tour-welcome-modal').classList.remove('active');
+
                 Onboarding.end(); 
             });
             document.getElementById('btn-welcome-start').addEventListener('click', () => {
@@ -84,7 +93,8 @@ export const Onboarding = {
         Onboarding.isActive = false;
         document.getElementById('tour-container').classList.remove('active');
         localStorage.setItem('has_completed_tour', 'true');
-        
+        Store.set('active_view', 'selling');
+        Store.set('sidebar_collapsed', false);
         // Mobile Cleanup: Ensure cart drawer closes when tour finishes
         const cart = document.querySelector('.cart-section');
         if (cart) cart.classList.remove('mobile-open');
@@ -141,9 +151,19 @@ export const Onboarding = {
             }
         }
 
+        if(Onboarding.currentStep === 3 && step.target === '[data-view="dashboard"]') {
+            Store.set('active_view', 'dashboard');
+        }
+
+        if(Onboarding.currentStep === 7 && step.target === '[data-view="settings"]') {
+            Store.set('active_view', 'settings');
+        }
+
         const executeDraw = () => {
             const targetEl = document.querySelector(step.target);
             if (!targetEl) return Onboarding.next();
+
+            targetEl.scrollIntoView({ behavior: 'auto', block: 'center' });
 
             const rect = targetEl.getBoundingClientRect();
             const highlight = document.getElementById('tour-highlight');
