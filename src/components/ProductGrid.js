@@ -219,7 +219,8 @@ export const initProductGrid = async (containerId) => {
                 
                 if (isEditMode) {
                     if (e.target.closest('.delete-badge')) {
-                        if (confirm('Delete this item?')) {
+                        const isConfirmed = await Dialog.warn(i18n.t('dialog_del_item_msg'), i18n.t('dialog_del_item_title'), false, true);
+                        if (isConfirmed) {
                             const storeName = type === 'set' ? 'product_sets' : 'products';
                             await DB.execute(storeName, 'readwrite', 'delete', id);
                             await loadData();
@@ -254,11 +255,14 @@ export const initProductGrid = async (containerId) => {
                         document.getElementById('modal-set').classList.add('active');
                     }
                 } else {
-                    if (type === 'set') return alert('Add individual items to the cart. Sets auto-apply!');
+                    if (type === 'set'){
+                        await Dialog.alert(i18n.t('dialog_alert_set_desc'), i18n.t('dialog_note'));
+                        return;
+                    }
                     
                     const product = products.find(p => p.id === id);
                     if (product.stock_quantity <= 0) {
-                        await Dialog.alert('This item is currently sold out.', 'Out of Stock');
+                        await Dialog.alert(i18n.t('dialog_alert_soldout_desc'), i18n.t('dialog_alert_soldout_title'));
                         return;
                     }
 
@@ -270,7 +274,8 @@ export const initProductGrid = async (containerId) => {
 
                     if (existingIndex > -1) {
                         if (currentCart[existingIndex].quantity >= product.stock_quantity) {
-                            return alert('Not enough stock available!');
+                            await Dialog.alert(i18n.t('dialog_alert_not_enought_desc'), i18n.t('dialog_alert_soldout_title'));
+                            return;
                         }
                         currentCart[existingIndex].quantity += 1;
                     } else {
@@ -295,8 +300,11 @@ export const initProductGrid = async (containerId) => {
         }
 
         if (document.getElementById('btn-add-set')) {
-            document.getElementById('btn-add-set').addEventListener('click', () => {
-                if(products.length === 0) return alert('You must add items before creating a set.');
+            document.getElementById('btn-add-set').addEventListener('click', async () => {
+                if(products.length === 0){
+                    await Dialog.alert(i18n.t('dialog_no_item_no_set'), i18n.t('dialog_note'));
+                    return;
+                }
                 editingId = null;
                 Store.set('sidebar_collapsed', true);
                 document.getElementById('input-set-name').value = '';
@@ -328,7 +336,10 @@ export const initProductGrid = async (containerId) => {
                 const price = parseInt(document.getElementById('input-item-price').value, 10);
                 const quant = parseInt(document.getElementById('input-item-quant').value, 10);
                 
-                if (!name || isNaN(price) || isNaN(quant)) return alert('Fill all fields correctly.');
+                if (!name || isNaN(price) || isNaN(quant)){
+                    await Dialog.alert(i18n.t('dialog_fill_correct'), i18n.t('dialog_alert'));
+                    return;
+                }
 
                 const payload = {
                     id: editingId || `p_${Date.now()}`, 
@@ -354,7 +365,10 @@ export const initProductGrid = async (containerId) => {
             saveSetBtn.addEventListener('click', async () => {
                 const name = document.getElementById('input-set-name').value;
                 const price = parseInt(document.getElementById('input-set-price').value, 10);
-                if (!name || isNaN(price)) return alert('Provide a valid name and price.');
+                if (!name || isNaN(price)){
+                    await Dialog.alert(i18n.t('dialog_set_correct'), i18n.t('dialog_alert'));
+                    return;
+                }
 
                 let included_items = [];
                 let valid = true;
@@ -366,7 +380,10 @@ export const initProductGrid = async (containerId) => {
                     } else { valid = false; }
                 });
 
-                if(!valid || included_items.length === 0) return alert('Select items and quantities properly.');
+                if(!valid || included_items.length === 0){
+                    await Dialog.alert(i18n.t('dialog_item_invalid'), i18n.t('dialog_alert'));
+                    return;
+                }
 
                 const payload = {
                     id: editingId || `s_${Date.now()}`, 

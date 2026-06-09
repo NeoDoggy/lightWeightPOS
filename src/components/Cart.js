@@ -131,7 +131,7 @@ export const initCart = async (containerId) => {
         const clearBtn = container.querySelector('#btn-clear-cart');
         if (clearBtn) {
             clearBtn.addEventListener('click', async () => {
-                const isConfirmed = await Dialog.confirm(i18n.t('clear_cart_confirm_message'), i18n.t('clear_cart_confirm_title'));
+                const isConfirmed = await Dialog.warn(i18n.t('clear_cart_confirm_message'), i18n.t('clear_cart_confirm_title'), false, true);
                 if (isConfirmed) {
                     Store.set('active_cart', []);
                 }
