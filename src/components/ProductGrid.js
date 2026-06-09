@@ -53,7 +53,8 @@ export const initProductGrid = async (containerId) => {
             disabled: !isEditMode, 
             animation: 150,        
             filter: '.add-card, .set-card', 
-            ghostClass: 'sortable-ghost',   
+            preventOnFilter: false,
+            ghostClass: 'sortable-ghost',  
             
             onEnd: async (evt) => {
                 const itemCards = grid.querySelectorAll('.product-card:not(.add-card):not(.set-card)');

@@ -709,6 +709,6 @@
 
 .sortable-ghost {
     opacity: 0.4;
-    border: 2px dashed var(--accent-blue) !important;
+    border: 2px dashed var(--accent-orange) !important;
     background: transparent !important;
 }
