@@ -1,7 +1,7 @@
 import { i18n } from "./i18n.js";
 
 export const Dialog = {
-    create: (title, message, isConfirm = false) => {
+    create: (title, message, isConfirm = false, isWarn = false) => {
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
             overlay.className = 'sys-dialog-overlay';
@@ -11,7 +11,7 @@ export const Dialog = {
                     <div class="sys-dialog-msg">${message}</div>
                     <div class="sys-dialog-actions">
                         ${isConfirm ? `<button class="btn-cancel" id="sys-dialog-cancel">${i18n.t('dialog_cancel_button')}</button>` : ''}
-                        <button class="btn-save" id="sys-dialog-ok">${i18n.t('dialog_confirm_button')}</button>
+                        <button class="${isWarn ? 'btn-warn' : 'btn-save'}" id="sys-dialog-ok">${i18n.t('dialog_confirm_button')}</button>
                     </div>
                 </div>
             `;
@@ -39,5 +39,6 @@ export const Dialog = {
     },
     
     alert: (message, title = 'Attention') => Dialog.create(title, message, false),
-    confirm: (message, title = 'Confirm Action') => Dialog.create(title, message, true)
+    confirm: (message, title = 'Confirm Action') => Dialog.create(title, message, true),
+    warn: (message, title = 'Confirm Action') => Dialog.create(title, message, true, true)
 };
