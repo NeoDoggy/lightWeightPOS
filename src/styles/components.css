@@ -230,35 +230,77 @@
     font-size: 0.85rem;
 }
 
-.ios-toggle {
-    position: relative;
-    width: 44px;
-    height: 24px;
-    background-color: var(--border-structural);
-    border-radius: 12px;
+.ios-toggle-label {
     cursor: pointer;
-    transition: background-color var(--transition-speed-normal) var(--easing-standard);
+    user-select: none;
 }
 
-.ios-toggle::after {
+.toggle-text {
+    font-weight: 600;
+}
+
+.ios-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex: 0 0 auto;
+}
+
+.ios-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: var(--border-component);
+    border-radius: 24px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+    transition: background-color 220ms var(--easing-standard),
+                box-shadow 220ms var(--easing-standard);
+}
+
+.slider::before {
     content: '';
     position: absolute;
-    top: 2px;
     left: 2px;
+    bottom: 2px;
     width: 20px;
     height: 20px;
     background-color: white;
     border-radius: 50%;
-    transition: transform var(--transition-speed-normal) var(--easing-standard);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.28);
+    transition: transform 220ms var(--easing-standard),
+                width var(--transition-speed-fast) var(--easing-standard),
+                box-shadow var(--transition-speed-fast) var(--easing-standard);
 }
 
-.ios-toggle.active {
+.ios-switch input:active + .slider::before {
+    width: 24px;
+}
+
+.ios-switch input:checked + .slider {
     background-color: var(--accent-green);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
 }
 
-.ios-toggle.active::after {
+.ios-switch input:checked + .slider::before {
     transform: translateX(20px);
+}
+
+.ios-switch input:checked:active + .slider::before {
+    transform: translateX(16px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .slider,
+    .slider::before {
+        transition-duration: 0ms;
+    }
 }
 
 /* Edit Mode Utilities */
@@ -400,6 +442,15 @@
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     transform: translateY(20px);
     transition: transform var(--transition-speed-normal) var(--easing-standard);
+    max-height: 65dvh;
+    /* overflow-y: auto; */
+}
+
+#set-items-container {
+    max-height: 25dvh; /* Keeps the list area contained */
+    overflow-y: auto;  /* Makes only the list scrollable */
+    overflow-x: hidden;
+    padding-right: 0.5rem; /* Prevents the scrollbar from overlapping the trash can icon */
 }
 
 .modal-overlay.active .modal-card {
@@ -504,6 +555,15 @@
 }
 
 /* --- Mobile View Overrides --- */
+
+@media (max-width: 768px){
+    #set-items-container {
+        max-height: 15dvh; /* Keeps the list area contained */
+        overflow-y: auto;  /* Makes only the list scrollable */
+        overflow-x: hidden;
+        padding-right: 0.5rem; /* Prevents the scrollbar from overlapping the trash can icon */
+    }
+}
 
 /* Sidebar Mobile Tabs */
 @media (max-width: 768px) {
