@@ -45,14 +45,22 @@ export const initCart = async (containerId) => {
         let setTotal = 0;
 
         availableSets.forEach(set => {
+            const normalizedIncludedItems = Object.values(set.included_items.reduce((items, req) => {
+                if (!items[req.id]) {
+                    items[req.id] = { id: req.id, quant: 0 };
+                }
+                items[req.id].quant += req.quant;
+                return items;
+            }, {}));
+
             let canFormSet = true;
             while(canFormSet) {
                 let matched = true;
-                for(let req of set.included_items) {
+                for(let req of normalizedIncludedItems) {
                     if(!itemPool[req.id] || itemPool[req.id] < req.quant) { matched = false; break; }
                 }
                 if(matched) {
-                    for(let req of set.included_items) { itemPool[req.id] -= req.quant; }
+                    for(let req of normalizedIncludedItems) { itemPool[req.id] -= req.quant; }
                     appliedSets.push(set);
                     setTotal += set.bundle_price;
                 } else {

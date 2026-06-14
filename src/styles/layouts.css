@@ -31,8 +31,8 @@
     flex-direction: column;
     background-color: var(--bg-base);
     position: relative;
-    overflow: hidden; /* Changed from auto: children handle their own scroll */
-    height: 100vh;
+    overflow: hidden;
+    height: 100dvh;
 }
 
 /* =========================================
@@ -132,13 +132,13 @@
     }
 
     #viewport-container {
-        height: calc(100vh - 70px); 
+        /* height: calc(100vh - 70px);  */
         height: calc(100dvh - 70px); 
     }
     
     .cart-section {
         bottom: 80px; 
-        height: 65vh; /* Maximize usable space on small phones */
+        height: 65dvh; /* Maximize usable space on small phones */
     }
 }
 

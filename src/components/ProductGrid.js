@@ -15,6 +15,7 @@ export const initProductGrid = async (containerId) => {
     let events = [];
     let products = [];
     let sets = [];
+    const editToggleAnimationMs = 200;
 
     const seedData = async () => {
         events = await DB.execute('events', 'readonly', 'getAll');
@@ -80,10 +81,13 @@ export const initProductGrid = async (containerId) => {
                 <select class="event-selector" id="event-select">
                     ${events.map(e => `<option value="${e.id}" ${e.id === currentEventId ? 'selected' : ''}>${e.name}</option>`).join('')}
                 </select>
-                <div id="grid-edit-id" class="toggle-container">
-                    <span>${i18n.t('edit_toggle_label')}</span>
-                    <div class="ios-toggle ${isEditMode ? 'active' : ''}" id="edit-toggle"></div>
-                </div>
+                <label id="grid-edit-id" class="toggle-container ios-toggle-label">
+                    <span class="toggle-text">${i18n.t('edit_toggle_label')}</span>
+                    <span class="ios-switch">
+                        <input type="checkbox" id="edit-toggle" ${isEditMode ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </span>
+                </label>
             </div>
             
             <div class="products-container" id="grid-items">
@@ -204,9 +208,9 @@ export const initProductGrid = async (containerId) => {
             render();
         });
 
-        document.getElementById('edit-toggle').addEventListener('click', () => {
-            isEditMode = !isEditMode;
-            render();
+        document.getElementById('edit-toggle').addEventListener('change', (e) => {
+            isEditMode = e.currentTarget.checked;
+            window.setTimeout(render, editToggleAnimationMs);
         });
 
         
@@ -372,16 +376,29 @@ export const initProductGrid = async (containerId) => {
 
                 let included_items = [];
                 let valid = true;
+                const selectedItemIds = new Set();
+                let hasDuplicateItems = false;
                 document.querySelectorAll('.set-item-row').forEach(row => {
                     const select = row.querySelector('.set-item-select');
                     const qty = row.querySelector('.set-item-quant');
-                    if(select.value && qty.value > 0) {
-                        included_items.push({ id: select.value, quant: parseInt(qty.value, 10) });
+                    const parsedQty = parseInt(qty.value, 10);
+                    if(select.value && !isNaN(parsedQty) && parsedQty > 0) {
+                        if (selectedItemIds.has(select.value)) {
+                            hasDuplicateItems = true;
+                            return;
+                        }
+                        selectedItemIds.add(select.value);
+                        included_items.push({ id: select.value, quant: parsedQty });
                     } else { valid = false; }
                 });
 
                 if(!valid || included_items.length === 0){
                     await Dialog.alert(i18n.t('dialog_item_invalid'), i18n.t('dialog_alert'));
+                    return;
+                }
+
+                if(hasDuplicateItems){
+                    await Dialog.alert(i18n.t('dialog_set_duplicate_item'), i18n.t('dialog_alert'));
                     return;
                 }
 
