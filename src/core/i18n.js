@@ -2,7 +2,7 @@ const dictionaries = {
     en: {
         settings_language_title: "Language",
         event_default_name: "Default",
-        app_title: "LW POS",
+        app_title: "CircleReg",
         nav_selling: "Selling",
         nav_dashboard: "Dashboard",
         nav_settings: "Settings",
@@ -14,7 +14,7 @@ const dictionaries = {
         tour_skip: "Skip Tour",
         tour_next: "Next",
         tour_finish: "Get Started",
-        tour_start_title: "Welcome to LW POS",
+        tour_start_title: "Welcome to CircleReg",
         tour_start_desc: "Let's take a quick look around. This sidebar is your main navigation hub.",
         tour_grid_1_title: "Catalog Grid",
         tour_grid_1_desc: "Tap these items to instantly add them to the current order. Perfect for fast-paced events.",
@@ -47,7 +47,7 @@ const dictionaries = {
         tour_end_title: "Replay the Tour",
         tour_end_desc: "You can replay this guided tour anytime from the settings page if you need a refresher.",
         // Welcome Modal Strings
-        tour_welcome_title: "Welcome to LW POS",
+        tour_welcome_title: "Welcome to CircleReg",
         tour_welcome_desc: "Would you like a quick interactive tour to learn how to manage events, add items, and checkout?",
         tour_welcome_skip: "No, skip it",
         tour_welcome_start: "Yes, start tour",
@@ -138,7 +138,7 @@ const dictionaries = {
     'zh-TW': {
         settings_language_title: "語言設定",
         event_default_name: "預設",
-        app_title: "輕量化 POS",
+        app_title: "サクレジ",
         nav_selling: "收銀",
         nav_dashboard: "儀表板",
         nav_settings: "設定",
@@ -150,7 +150,7 @@ const dictionaries = {
         tour_skip: "跳過導覽",
         tour_next: "下一步",
         tour_finish: "開始使用",
-        tour_start_title: "歡迎使用",
+        tour_start_title: "歡迎使用速快結",
         tour_start_desc: "讓我們快速了解一下。左側是您的主要導航列。",
         tour_grid_1_title: "商品區",
         tour_grid_1_desc: "點擊區域內的商品即可將其加入當前訂單。",
@@ -183,7 +183,7 @@ const dictionaries = {
         tour_end_title: "重播導覽",
         tour_end_desc: "您可以隨時在設定頁面重播這個導覽以重新熟悉系統。",
         // Welcome Modal Strings
-        tour_welcome_title: "歡迎使用輕量化 POS",
+        tour_welcome_title: "歡迎使用サクレジ",
         tour_welcome_desc: "您想要進行快速的互動式導覽，學習如何管理活動、新增商品以及結帳嗎？",
         tour_welcome_skip: "不，跳過導覽",
         tour_welcome_start: "好，開始導覽",
