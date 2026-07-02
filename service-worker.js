@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lwPosCache-v1.1.2';
+const CACHE_NAME = 'CircleReg-v1.1.2';
 const CORE_ASSETS = [
     './',
     './index.html',
